@@ -1,0 +1,31 @@
+---
+- name: Backup network device configs
+  hosts: n9k
+  gather_facts: no
+  vars_files:
+  - vault.yml
+  tasks:
+  - name: Backup (NDB role)
+    import_role:
+      name: network_device_backup
+    vars:
+      ndb_backup_dir: "./files/"
+
+- name: Manage and compare backup files
+  hosts: localhost
+  connection: local
+  gather_facts: no
+  tasks:
+  - name: Copy newest backup file
+    copy:
+      src: ./files/<need-to-get-right-filename-here>
+      dest: ./files/temp/<new-file-name>
+  - name: Remove time date stamp
+    lineinfile:
+      path: ./files/<new-file-name>
+      state: absent
+      regexp: '^!Time:'
+
+
+
+...
